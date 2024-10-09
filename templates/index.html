@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="start-btn">Start</button>
+    <center><h1><p id="result">---</p></h1></center>
+
+    <script>
+        const recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.lang = 'en-US'
+
+        document.getElementById("start-btn").addEventListener("click", ()=>{
+            recognition.start();
+        });
+
+        recognition.onresult = (event) =>{
+            const Query = event.results[0][0].transcript;
+            document.getElementById("result").textContent = Query
+
+            fetch("/get-ai-response", {
+                method: 'POST', 
+                headers: {
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify({ query: Query})
+            }).then(response => response.json())
+            .then(data => {
+                const aiResponse = data.Response;
+                document.getElementById("result").textContent = aiResponse;
+
+                fetch("/speech-to-text", {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify({ response: aiResponse})
+                }).then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error("Error", error))
+            }
+            )
+            .catch(error => console.error("Error", error))
+
+            
+        }
+
+    </script>
+</body>
+</html>
