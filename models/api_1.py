@@ -1,1 +1,1 @@
-groq_api_key = "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"
+groq_api_key = "Enter groq API" #Get it from https://www.console.groq.com/keys
